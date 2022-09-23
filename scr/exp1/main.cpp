@@ -3,14 +3,15 @@
 #include<fstream>
 #include"table.h"
 #include<vector>
-#define BUF_SIZE 1024
+#include <iomanip>
+
 using namespace std;
 
 int STATE;//µ±Ç°×´Ì¬Ö¸Ê¾
 int iskey;//±ê¼ÇÊÇ·ñÎª¹Ø¼ü×Ö
 char C;//´æ·Åµ±Ç°´æÈëµÄ×Ö·û
 string token;//´æ·Åµ±Ç°ÕıÔÚÊ¶±ğµÄµ¥´Ê×Ö·û´®
-char buffer[2 * BUF_SIZE];//´æ·Å»º³åÇø
+
 int forward=0;//ÏòÇ°Ö¸Õë
 int lexmebegin=0;//¿ªÊ¼Ö¸Õë
 vector<Binary> mytable;
@@ -127,39 +128,46 @@ int table_insert(Mark sign,string word)//½«Ê¶±ğ³öÀ´µÄ±êÊ¶·û²åÈë·ûºÅ±í£¬·µ»Ø¸Ãµ¥´
 
 void print_mark(Mark x)
 {
-	cout << "<";
 	switch (x)
 	{
 	case id:
-		cout << "id ,";
+		cout << setw(25) << "id" ;
+		myread.fout << setiosflags(ios::left) << setw(25) << "id";
 		my_statis.num_id++;
 		break;
 	case num:
-		cout << "num ,";
+		cout <<setw(25)  << "num";
+		myread.fout << setiosflags(ios::left) << setw(25) << "num";
 		my_statis.num_num++;
 		break;
 	case integer:
-		cout << "integer ,";
+		cout << setw(25) << "integer" ;
+		myread.fout << setiosflags(ios::left) << setw(25) << "integer";
 		my_statis.num_integer++;
 		break;
 	case keyword:
-		cout << "keyword ,";
+		cout << setw(25) << "keyword";
+		myread.fout << setiosflags(ios::left) << setw(25) << "keyword";
 		my_statis.num_keyword++;
 		break;
 	case operater:
-		cout << "operater ,";
+		cout << setw(25) << "operater";
+		myread.fout << setiosflags(ios::left) << setw(25) << "operator";
 		my_statis.num_operater++;
 		break;
-	case single:
-		cout << "single ,";
+	case pound_sign:
+		cout << setw(25) << "pound_sign";
+		myread.fout << setiosflags(ios::left) << setw(25) << "pound_sign";
 		my_statis.num_single++;
 		break;
 	case my_string:
-		cout << "string ,";
+		cout << setw(25) << "string";
+		myread.fout <<setiosflags(ios::left) << setw(25) << "string";
 		my_statis.num_my_string++;
 		break;
 	case my_char:
-		cout << "char ,";
+		cout << setw(25) << "char" ;
+		myread.fout << setiosflags(ios::left) << setw(25) << "char";
 		my_statis.num_my_char++;
 		break;
 	default:
@@ -170,62 +178,26 @@ void print_mark(Mark x)
 void return_ID(Mark x, string word)
 {
 	print_mark(x);
-	cout << word << ">" << endl;
+	cout << "     " << word << endl;
+	myread.fout  << word << endl;
 }
 
 void return_ID(Mark x, long long word)
 {
 	print_mark(x);
-	cout << word << ">" << endl;
+	cout << "     " << word << endl;
+	myread.fout << word << endl;
 }
 
 void return_ID(Mark x, double word)
 {
 	print_mark(x);
-	cout << word << ">" << endl;
+	cout << "     " << word <<  endl;
+	myread.fout <<word << endl;
 }
 
 //errorº¯Êı Óë returnº¯Êı
-class file_read//ÎÄ¼ş¶ÁĞ´Àà
-{
-public:
-	void read_front()//¶ÁĞ´Ò»´ÎÎÄ¼ş ´æÈëÇ°°ë²¿·Ö»º³åÇø
-	{
-		int pos = 0;
-		while ((buffer[pos] = fin.get()) != EOF && pos<1024)
-		{
-			pos++;
-		}
-	}
 
-	void read_behind()//¶ÁĞ´Ò»´ÎÎÄ¼ş ´æÈëºó°ë²¿·Ö»º³åÇø
-	{
-		int pos = 0;
-		while ((buffer[pos+1024] = fin.get()) != EOF && pos < 1024)
-		{
-			pos++;
-		}
-	}
-
-	file_read()//¹¹Ôìº¯Êı
-	{
-		fin.open("test.txt", ios::in);
-		if (!fin.is_open())
-		{
-			std::cerr << "can't open the file" << endl;
-		}
-		memset(buffer, 0, 2*BUF_SIZE);
-	}
-	~file_read()
-	{
-
-	}
-
-private:
-	ifstream fin;
-};
-
-file_read myread;
 
 void get_char()//¸ù¾İforward¶ÁÈ¡Ò»¸ö×Ö·û ´æÈë±äÁ¿C ²¢ÒÆ¶¯forward
 {
@@ -271,13 +243,27 @@ void get_nbc()//¼ì²éCÖĞµÄ×Ö·ûÊÇ·ñÎª¿Õ¸ñ ÈôÊÇÔò·´¸´µ÷ÓÃget_char Ö±µ½CÖĞ½øÈëÒ»¸ö·Ç
 
 void error()
 {
+	my_statis.num_error++;
+	cout << setw(25) << "error";
+	cout << "     C:"<< C <<" " << "token:" << token << endl;
+	cout << setw(25) << "error lines:";
+	cout <<"     " << my_statis.my_line << endl;
 
+	myread.fout << setw(25) << "error";
+	myread.fout << "C:" << C << " " << "token:" << token << endl;
+	myread.fout << setw(25) << "error lines:";
+	myread.fout << my_statis.my_line << endl;
+	STATE = 0;
 }
+
 int main()
 {
 	//¶ÁÎÄ¼ş
 	myread.read_front();//ÏÈ¶ÁÈ¡Ò»´ÎÇ°°ë²¿·Ö
-
+	myread.fout.setf(ios::left);
+	cout.setf(ios::left);
+	cout << setw(25) << "Type" << "     " << "Value" << endl;
+	myread.fout<< setw(25) << "Type" << "Value" << endl;
 	STATE = 0;
 	do
 	{
@@ -394,23 +380,23 @@ int main()
 				break;
 			case'(':
 				STATE = 0;
-				return_ID(single,"(");
+				return_ID(pound_sign,"(");
 				break;
 			case')':
 				STATE = 0;
-				return_ID(single, ")");
+				return_ID(pound_sign, ")");
 				break;
 			case';':
 				STATE = 0;
-				return_ID(single, ";");
+				return_ID(pound_sign, ";");
 				break;
 			case'[':
 				STATE = 0;
-				return_ID(single, "[");
+				return_ID(pound_sign, "[");
 				break;
 			case']':
 				STATE = 0;
-				return_ID(single, "]");
+				return_ID(pound_sign, "]");
 				break;
 			case '.':
 				STATE = 0;
@@ -422,7 +408,7 @@ int main()
 				break;
 			case',':
 				STATE = 0;
-				return_ID(single, ",");
+				return_ID(pound_sign, ",");
 				break;
 			case'?':
 				STATE = 0;
@@ -430,7 +416,7 @@ int main()
 				break;
 			case'#':
 				STATE = 0;
-				return_ID(single, "#");
+				return_ID(pound_sign, "#");
 				break;
 			case':':
 				STATE = 0;
@@ -438,27 +424,27 @@ int main()
 				break;
 			case'{':
 				STATE = 0;
-				return_ID(single, "{");
+				return_ID(pound_sign, "{");
 				break;
 			case'}':
 				STATE = 0;
-				return_ID(single, "}");
+				return_ID(pound_sign, "}");
 				break;
 			case'"':
-				return_ID(single, "\"");
+				return_ID(pound_sign, "\"");
 				token = "";//½«tokenÇåÁã ×¼±¸¶ÁÈë×Ö·û´®
 				C = 0;
 				STATE = 28;
 				break;
 			case'\'':
-				return_ID(single, "'");
+				return_ID(pound_sign, "'");
 				token = "";//½«tokenÇåÁã ×¼±¸¶ÁÈë×Ö·û
 				STATE = 29;
 				C = 0;
 				break;
 			default:
 				STATE = 13;//ÉèÖÃ´íÎó×´Ì¬
-				cout << "oh,no!there is an error" << endl;
+				error();
 				break;
 			}
 			break;
@@ -837,7 +823,7 @@ int main()
 			if (C == '"')
 			{
 				return_ID(my_string, token);
-				return_ID(single, "\"");
+				return_ID(pound_sign, "\"");
 				STATE = 0;
 			}
 			/*else if (C == '\\')
@@ -857,7 +843,7 @@ int main()
 			if (C == '\'')
 			{
 				return_ID(my_char, token);
-				return_ID(single, "'");
+				return_ID(pound_sign, "'");
 				STATE = 0;
 			}
 			else if (C == '\\')
