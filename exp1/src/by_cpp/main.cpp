@@ -14,6 +14,7 @@ string token;//´æ·Åµ±Ç°ÕıÔÚÊ¶±ğµÄµ¥´Ê×Ö·û´®
 
 int forward=0;//ÏòÇ°Ö¸Õë
 int lexmebegin=0;//¿ªÊ¼Ö¸Õë
+int is_retract = 0;
 vector<Binary> mytable;
 string keywords[]={ "auto", "double" ,"int" ,"struct" ,"break" ,"else" ,"long" ,"switch",
 
@@ -30,9 +31,9 @@ void cat()//°ÑCÖĞµÄ×Ö·ûÁ¬½ÓÔÚtokenµÄ×Ö·û´®ºóÃæ
 	token = token + C;
 }
 
-bool letter()//ÅĞ¶ÏCÖĞ×Ö·ûÊÇ·ñÎª×ÖÄ¸
+bool letter()//ÅĞ¶ÏCÖĞ×Ö·ûÊÇ·ñÎª×ÖÄ¸»òÏÂ»®Ïß
 {
-	if ((C >= 'A' && C <= 'Z') || (C >= 'a' && C <= 'z'))
+	if ((C >= 'A' && C <= 'Z') || (C >= 'a' && C <= 'z')||C=='_')
 		return true;
 	else
 		return false;
@@ -48,7 +49,20 @@ bool digit()//ÅĞ¶ÏCÖĞ×Ö·ûÊÇ·ñÎªÊı×Ö
 
 void retract()//forwardºóÍËÒ»¸ö×Ö·û
 {
-	::forward--;
+	if (C=='\n')
+	{
+		my_statis.my_line--;
+	}
+	if (::forward != 0)
+	{
+		::forward--;
+		is_retract = 1;
+	}
+	else
+	{
+		::forward = 2047;
+		is_retract = 1;
+	}
 }
 
 int reserve()//tokenÄÚµ¥´ÊÊÇ¹Ø¼ü×Ö ·µ»Ø¹Ø¼ü×Ö¼ÇºÅ ·ñÔò·µ»Ø-1
@@ -128,6 +142,9 @@ int table_insert(Mark sign,string word)//½«Ê¶±ğ³öÀ´µÄ±êÊ¶·û²åÈë·ûºÅ±í£¬·µ»Ø¸Ãµ¥´
 
 void print_mark(Mark x)
 {
+	my_statis.num_char++;
+	cout << "line:" << setw(5) << my_statis.my_line;
+	myread.fout << setiosflags(ios::left) << "line:" << setw(5) << my_statis.my_line;
 	switch (x)
 	{
 	case id:
@@ -136,8 +153,8 @@ void print_mark(Mark x)
 		my_statis.num_id++;
 		break;
 	case num:
-		cout <<setw(25)  << "num";
-		myread.fout << setiosflags(ios::left) << setw(25) << "num";
+		cout <<setw(25)  << "Unsigned number";
+		myread.fout << setiosflags(ios::left) << setw(25) << "Unsigned number";
 		my_statis.num_num++;
 		break;
 	case integer:
@@ -206,30 +223,35 @@ void get_char()//¸ù¾İforward¶ÁÈ¡Ò»¸ö×Ö·û ´æÈë±äÁ¿C ²¢ÒÆ¶¯forward
 	{
 		my_statis.my_line++;
 	}
-	if (!(C == ' ' || C == '\n' || C == '\r' || C == '\t'))
-	{
-		my_statis.num_char++;
-	}
-	if (C == EOF)
+	/*if (C == EOF)
 	{
 		cout << "´Ê·¨·ÖÎö½áÊø" << endl;
 		my_statis.print_num();
 		exit(0);
-	}
+	}*/
 
 	if (::forward == 1023)
 	{
-		myread.read_behind();
+		if (!is_retract)
+		{
+			myread.read_behind();
+		}
 		::forward++;
+		is_retract = 0;
 	}
 	else if (::forward == 2047)
 	{
-		myread.read_front();
+		if (!is_retract)
+		{
+			myread.read_front();
+		}
 		::forward=0;
+		is_retract = 0;
 	}
 	else
 	{
 		::forward++;
+		is_retract = 0;
 	}
 }
 
@@ -262,10 +284,10 @@ int main()
 	myread.read_front();//ÏÈ¶ÁÈ¡Ò»´ÎÇ°°ë²¿·Ö
 	myread.fout.setf(ios::left);
 	cout.setf(ios::left);
-	cout << setw(25) << "Type" << "     " << "Value" << endl;
-	myread.fout<< setw(25) << "Type" << "Value" << endl;
+	cout << setw(35) << "          Type" << "     " << "Value" << endl;
+	myread.fout<< setw(35) << "          Type" << "Value" << endl;
 	STATE = 0;
-	do
+	while (C != EOF)
 	{
 		switch (STATE)
 		{
@@ -431,20 +453,23 @@ int main()
 				return_ID(pound_sign, "}");
 				break;
 			case'"':
-				return_ID(pound_sign, "\"");
-				token = "";//½«tokenÇåÁã ×¼±¸¶ÁÈë×Ö·û´®
+				//return_ID(pound_sign, "\"");
+				token = "\"";//½«tokenÇåÁã ×¼±¸¶ÁÈë×Ö·û´®
 				C = 0;
 				STATE = 28;
 				break;
 			case'\'':
-				return_ID(pound_sign, "'");
-				token = "";//½«tokenÇåÁã ×¼±¸¶ÁÈë×Ö·û
+				//return_ID(pound_sign, "'");
+				token = "\'";//½«tokenÇåÁã ×¼±¸¶ÁÈë×Ö·û
 				STATE = 29;
 				C = 0;
 				break;
 			default:
-				STATE = 13;//ÉèÖÃ´íÎó×´Ì¬
-				error();
+				if (C!=EOF)
+				{
+					STATE = 13;//ÉèÖÃ´íÎó×´Ì¬
+					error();
+				}
 				break;
 			}
 			break;
@@ -578,7 +603,7 @@ int main()
 			{
 				retract();
 				STATE = 0;
-				return_ID(num,stod(token));//·µ»ØÎŞ·ûºÅÊı
+				return_ID(num,token);//·µ»ØÎŞ·ûºÅÊı
 			}
 			break;
 		case 8://'<'×´Ì¬
@@ -822,16 +847,17 @@ int main()
 			get_char();
 			if (C == '"')
 			{
+				cat();
 				return_ID(my_string, token);
-				return_ID(pound_sign, "\"");
+				//return_ID(pound_sign, "\"");
 				STATE = 0;
 			}
-			/*else if (C == '\\')
+			else if (C == '\\')
 			{
 				cat();
 				get_char(); 
 				STATE = 28;
-			}*/
+			}
 			else
 			{
 				STATE = 28;
@@ -842,8 +868,9 @@ int main()
 			get_char();
 			if (C == '\'')
 			{
+				cat();
 				return_ID(my_char, token);
-				return_ID(pound_sign, "'");
+				//return_ID(pound_sign, "'");
 				STATE = 0;
 			}
 			else if (C == '\\')
@@ -860,8 +887,14 @@ int main()
 		default:
 			break;
 		}
-	} while (C!=EOF);
+	} 
 
-	my_statis.print_num();
+	if (C == EOF)
+	{
+		cout << "´Ê·¨·ÖÎö½áÊø" << endl;
+		//my_statis.my_line++;
+		my_statis.print_num();
+		exit(0);
+	}
 	return 0;
 }

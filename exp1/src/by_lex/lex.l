@@ -30,21 +30,20 @@ STRING (\"([^\\\"\n]|\\.)*\")
 
 CHAR (\'([^\'\\]|\\.)*\')
 
-KEYWORD "auto"|"double"|"int"|"struct"|"break"|"else"|"long"|"switch"|"case"|"enum"|"register"|"typedef"|"char"|"extern"|"return"|"unionconst"|"float"|"short"|"unsigned"|"continue"|"for"|"signed"|"void"|"default"|"goto"|"sizeof"|"volatile"|"do"|"if"|"while"|"static"
+KEYWORD "auto"|"double"|"int"|"struct"|"break"|"else"|"long"|"switch"|a"case"|"enum"|"register"|"typedef"|"char"|"extern"|"return"|"union"|"const"|"float"|"short"|"unsigned"|"continue"|"for"|"signed"|"void"|"default"|"goto"|"sizeof"|"volatile"|"do"|"if"|"while"|"static"
 
 IDENTIFIER ({letter}({letter}|{digit})*)
 
 OPERATOR "+"|"."|"->"|"-"|"++"|"--"|"*"|"&"|"!"|"~"|"/"|"%"|"<<"|">>"|">"|"<"|">="|"<="|"=="|"!="|"^"|"|"|"&&"|"||"|"="|"/="|"*="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|="|":"|"?"
 
-POUND_SIGN "("|")"|"["|"]"|"{"|"}"|"#"|";"|","
-
 INTEGER ({digit}+)
 
 UNSIGNED_NUM ({digit}+(\.{digit}+)?([Ee][+-]?{digit}+)?)
 
-
+POUND_SIGN "("|")"|"["|"]"|"{"|"}"|"#"|";"|","
 
 %%
+
 {KEYWORD} {
 	printf("line%d:(KEYWORD, %s)\n\n",line,yytext);
 	num_keyword++;
@@ -99,9 +98,11 @@ UNSIGNED_NUM ({digit}+(\.{digit}+)?([Ee][+-]?{digit}+)?)
 	}
 }
 
-\n      {
+\n  {
     line++;
 }
+
+[ \t]                   { /*ºöÂÔ¿Õ°××Ö·û*/ }
 
 %%
 int main()

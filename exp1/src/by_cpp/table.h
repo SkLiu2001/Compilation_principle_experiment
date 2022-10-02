@@ -4,29 +4,42 @@
 #include <iomanip>
 #define BUF_SIZE 1024
 using namespace std;
-char buffer[2 * BUF_SIZE];//?????
-class file_read//?????
+char buffer[2 * BUF_SIZE];//存放缓冲区
+class file_read//文件读写类
 {
 public:
-	void read_front()//?????? ?????????
+	void read_front()//读写一次文件 存入前半部分缓冲区
 	{
 		int pos = 0;
-		while ((buffer[pos] = fin.get()) != EOF && pos < 1024)
+		while (pos < 1024)
 		{
+			buffer[pos] = fin.get();
+			if (buffer[pos]==EOF)
+			{
+				break;
+			}
 			pos++;
 		}
+		//cout << buffer << endl;
+		//cout << strlen(buffer) << endl;
 	}
 
-	void read_behind()//?????? ?????????
+	void read_behind()//读写一次文件 存入后半部分缓冲区
 	{
 		int pos = 0;
-		while ((buffer[pos + 1024] = fin.get()) != EOF && pos < 1024)
+		while ( pos < 1024)
 		{
+			buffer[pos + 1024] = fin.get();
+			if (buffer[pos + 1024]==EOF)
+			{
+				break;
+			}
 			pos++;
 		}
+		//cout << buffer << endl;
 	}
 
-	file_read()//????
+	file_read()//构造函数
 	{
 		fin.open("test.txt", ios::in);
 		if (!fin.is_open())
@@ -76,8 +89,7 @@ public:
 	double Unsigned_number;
 	string word="";
 private:
-
-};//???
+};//二元式
 
 Binary ::Binary ()
 {
@@ -92,7 +104,7 @@ class Statistics
 public:
 	Statistics();
 	~Statistics();
-	int my_line = 0;
+	int my_line = 1;
 	//int my_column = 0;
 	long long num_char = 0;
 
@@ -108,7 +120,7 @@ public:
 
 	void print_num() 
 	{
-		cout << "??????" << endl;
+		cout << "分析报告如下" << endl;
 		cout << setw(30) << "total_lines:" << my_line << endl;
 		cout << setw(30) << "total_chars:" << num_char << endl;
 		cout << setw(30) << "total_errors:" << num_error << endl;
